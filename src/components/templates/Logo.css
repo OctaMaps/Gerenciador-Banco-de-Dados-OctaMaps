@@ -1,0 +1,12 @@
+aside.logo {
+  background-color: var(--bg-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+aside.logo img {
+  width: 100%;
+  background-color: #FFF;
+}
