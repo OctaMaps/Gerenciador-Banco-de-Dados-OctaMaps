@@ -405,26 +405,6 @@ export default class ClassRoom extends Component {
 		}
 	}
 
-	// renderTh = () => {
-	// 	let icon
-	// 	return thList.map(item => {
-	// 		if (item.showSort) {
-	// 			icon =
-	// 				this.state.listOrder === "increasing" ? "fa-sort-up" : "fa-sort-down"
-	// 		} else {
-	// 			icon = "fa-sort text-muted"
-	// 		}
-	// 		return (
-	// 			<th onClick={() => this.listSort(item.id)}>
-	// 				<span style={thStyle}>
-	// 					{item.label}
-	// 					<i className={`fa ${icon} fa-fw`} />
-	// 				</span>
-	// 			</th>
-	// 		)
-	// 	})
-	// }
-
 	renderForm = () => {
 		if (this.state.showForm) {
 			const {
