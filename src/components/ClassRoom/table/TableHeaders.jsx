@@ -4,7 +4,6 @@ export default props => {
 	const thStyle = {
 		cursor: "pointer"
 	}
-
 	let icon
 	return props.values.map(item => {
 		if (item.showSort) {

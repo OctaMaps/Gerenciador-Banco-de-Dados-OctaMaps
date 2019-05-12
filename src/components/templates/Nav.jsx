@@ -12,9 +12,6 @@ export default props => {
 				<NavLink activeClassName="active-link" to="/salas">
 					<i className="fa fa-book fa-fw" /> Salas
 				</NavLink>
-				<NavLink activeClassName="active-link" to="/imprimirLista">
-					<i className="fa fa-print fa-fw" /> Imprimir
-				</NavLink>
 			</nav>
 		</aside>
 	)

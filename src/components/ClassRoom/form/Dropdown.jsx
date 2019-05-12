@@ -2,7 +2,7 @@ import React from "react"
 
 export default props => {
 	const showOptions = array => {
-		return array.map(item => <option>{item}</option>)
+		return array.map(item => <option key={item}>{item}</option>)
 	}
 	return (
 		<div className="col-12 col-md-6">
