@@ -12,7 +12,7 @@ export default props => {
 	}
 	const renderIcons = values => {
 		return values.map(item => (
-			<span style={spanStyle} className="input-group-text">
+			<span key={item} style={spanStyle} className="input-group-text">
 				{item}
 			</span>
 		))
@@ -22,7 +22,7 @@ export default props => {
 			<div className="form-group">
 				<label htmlFor={name}>{label}</label>
 				<div className="input-group">
-					<div class="input-group-prepend">{renderIcons(values)}</div>
+					<div className="input-group-prepend">{renderIcons(values)}</div>
 					<input
 						style={textInputStyle}
 						type="text"

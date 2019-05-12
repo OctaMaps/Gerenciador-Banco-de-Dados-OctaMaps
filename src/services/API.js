@@ -21,10 +21,17 @@ function API(url) {
 		return response
 	}
 
-	const getList = async url => {
-		const response = await axios["get"](url, { responseType: "blob" })
-		const listBlob = new Blob([response.data], { type: "application/pdf" })
-		saveAs(listBlob, "list.pdf")
+	const fetchAndGetList = async list => {
+		try {
+			await axios.post("http://localhost:3002/fetch-list", list)
+			const response = await axios.get("http://localhost:3002/get-list", {
+				responseType: "blob"
+			})
+			const listBlob = new Blob([response.data], { type: "application/pdf" })
+			saveAs(listBlob, "list.pdf")
+		} catch (error) {
+			throw new Error(error)
+		}
 	}
 
 	return {
@@ -32,7 +39,7 @@ function API(url) {
 		save,
 		remove,
 		baseUrl,
-		getList
+		fetchAndGetList
 	}
 }
 

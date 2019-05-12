@@ -4,7 +4,6 @@ export default props => {
 	const thStyle = {
 		cursor: "pointer"
 	}
-
 	let icon
 	return props.values.map(item => {
 		if (item.showSort) {
@@ -13,7 +12,7 @@ export default props => {
 			icon = "fa-sort text-muted"
 		}
 		return (
-			<th onClick={() => props.onClick(item.id)}>
+			<th key={item.id} onClick={() => props.onClick(item.id)}>
 				<span style={thStyle}>
 					{item.label}
 					<i className={`fa ${icon} fa-fw`} />
