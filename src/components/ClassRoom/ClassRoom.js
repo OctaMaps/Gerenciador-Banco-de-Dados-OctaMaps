@@ -124,6 +124,9 @@ export default class ClassRoom extends Component {
 	}
 
 	clear = () => {
+		const { classRoom } = this.state
+		classRoom.codigo_sala = this.codigoSalaHandling(classRoom, "join")
+		this.setState({ classRoom })
 		this.setState({ classRoom: initialState.classRoom })
 		this.formToggle()
 		this.setState({ saveButtonText: initialState.saveButtonText })
@@ -131,7 +134,6 @@ export default class ClassRoom extends Component {
 
 	save = async classRoom => {
 		try {
-			console.log(classRoom.codigo_sala)
 			classRoom.codigo_sala = this.codigoSalaHandling(classRoom, "join")
 			const response = await api.save(classRoom)
 			const list = this.getUpdatedList(response.data)
@@ -215,7 +217,6 @@ export default class ClassRoom extends Component {
 	}
 
 	addZeroToCodigoSala = codigo_sala => {
-		// console.log(codigo_sala)
 		if (codigo_sala.length < 3) {
 			if (
 				(isNaN(codigo_sala) && codigo_sala.length === 2) ||
@@ -397,12 +398,36 @@ export default class ClassRoom extends Component {
 							</tr>
 						</thead>
 						<tbody>
-							<Rows values={this.state.list} />
+							<Rows
+								values={this.state.list}
+								remove={this.remove}
+								load={this.load}
+							/>
 						</tbody>
 					</table>
 				</div>
 			)
 		}
+	}
+
+	renderTh = () => {
+		let icon
+		return thList.map(item => {
+			if (item.showSort) {
+				icon =
+					this.state.listOrder === "increasing" ? "fa-sort-up" : "fa-sort-down"
+			} else {
+				icon = "fa-sort text-muted"
+			}
+			return (
+				<th onClick={() => this.listSort(item.id)}>
+					<span>
+						{item.label}
+						<i className={`fa ${icon} fa-fw`} />
+					</span>
+				</th>
+			)
+		})
 	}
 
 	renderForm = () => {
@@ -414,7 +439,7 @@ export default class ClassRoom extends Component {
 				titulo_sala
 			} = this.state.classRoom
 			return (
-				<form onSubmit={() => this.save(this.state.classRoom)} className="form">
+				<form className="form">
 					<div className="row">
 						<Dropdown
 							values={tituloBlocoList}
@@ -450,10 +475,15 @@ export default class ClassRoom extends Component {
 					</div>
 					<div className="row">
 						<div className="col-12 d-flex justify-content-end">
-							<button type="submit" className="btn btn-primary">
+							<button
+								type="button"
+								onClick={() => this.save(this.state.classRoom)}
+								className="btn btn-primary"
+							>
 								{this.state.saveButtonText}
 							</button>
 							<button
+								type="button"
 								className="btn btn-secondary ml-2"
 								onClick={() => this.clear()}
 							>

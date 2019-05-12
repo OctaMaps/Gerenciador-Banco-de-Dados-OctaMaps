@@ -12,13 +12,13 @@ export default props => {
 				<td>
 					<button
 						className="btn btn-warning"
-						onClick={() => this.load(classRoom)}
+						onClick={() => props.load(classRoom)}
 					>
 						<i className="fa fa-pencil" />
 					</button>
 					<button
 						className="btn btn-danger ml-2"
-						onClick={() => this.remove(classRoom)}
+						onClick={() => props.remove(classRoom)}
 					>
 						<i className="fa fa-trash" />
 					</button>

@@ -13,7 +13,7 @@ export default props => {
 			icon = "fa-sort text-muted"
 		}
 		return (
-			<th onClick={() => props.onClick(item.id)}>
+			<th key={item.id} onClick={() => props.onClick(item.id)}>
 				<span style={thStyle}>
 					{item.label}
 					<i className={`fa ${icon} fa-fw`} />
