@@ -11,16 +11,12 @@ export default props => {
 						<TableHeaders
 							values={props.thList}
 							listOrder={props.listOrder}
-							onClick={props.onClick.bind(this)}
+							onClick={props.onClick}
 						/>
 					</tr>
 				</thead>
 				<tbody>
-					<Rows
-						values={props.list}
-						remove={props.remove.bind(this)}
-						load={props.load.bind(this)}
-					/>
+					<Rows values={props.list} remove={props.remove} load={props.load} />
 				</tbody>
 			</table>
 		</div>

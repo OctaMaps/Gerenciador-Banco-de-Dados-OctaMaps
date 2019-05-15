@@ -7,8 +7,10 @@ export default props => {
 		backgroundColor: "#2c3e50",
 		marginRight: "10px",
 		marginLeft: "10px",
-		marginBottom: "10px"
+		marginBottom: "10px",
+		fontWeight: "bold"
 	}
+
 	const {
 		formToggle,
 		filterToggle,

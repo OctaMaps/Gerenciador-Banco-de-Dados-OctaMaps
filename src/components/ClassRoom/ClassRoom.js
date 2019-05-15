@@ -48,7 +48,8 @@ const initialState = {
 	showTableOptions: true,
 	showTable: true,
 	showForm: false,
-	showFilter: false
+	showFilter: false,
+	errors: []
 }
 
 const thList = [
@@ -108,18 +109,21 @@ export default class ClassRoom extends Component {
 	}
 
 	save = async classRoom => {
-		try {
-			classRoom.codigo_sala = this.codigoSalaHandling(classRoom, "join")
-			const response = await api.save(classRoom)
-			const list = this.getUpdatedList(response.data)
-			this.setState({
-				list,
-				classRoom: initialState.classRoom,
-				saveButtonText: initialState.saveButtonText
-			})
-			this.formToggle()
-		} catch (error) {
-			throw new Error(error)
+		this.errorHandling(classRoom)
+		if (this.state.errors.length < 1) {
+			try {
+				classRoom.codigo_sala = this.codigoSalaHandling(classRoom, "join")
+				const response = await api.save(classRoom)
+				const list = this.getUpdatedList(response.data)
+				this.setState({
+					list,
+					classRoom: initialState.classRoom,
+					saveButtonText: initialState.saveButtonText
+				})
+				this.formToggle()
+			} catch (error) {
+				throw new Error(error)
+			}
 		}
 	}
 
@@ -189,6 +193,28 @@ export default class ClassRoom extends Component {
 			codigo_sala = this.addZeroToCodigoSala(codigo_sala)
 			return codigo_sala.slice(2)
 		}
+	}
+
+	errorHandling = async classRoom => {
+		const { errors } = this.state
+		const emptyKeys = this.emptyKeys(classRoom)
+		if (emptyKeys.length >= 1) {
+			const fields = [...emptyKeys]
+			const error = {
+				title: "Todos os campos devem ser preenchidos",
+				fields
+			}
+			errors.push(error)
+		}
+		await this.setState({ errors })
+	}
+
+	emptyKeys = classRoom => {
+		const classRoomKeys = Object.keys(classRoom)
+		const emptyKeys = classRoomKeys.filter(
+			key => !classRoom[key] && classRoom[key] !== "id"
+		)
+		return emptyKeys
 	}
 
 	addZeroToCodigoSala = codigo_sala => {
@@ -348,6 +374,7 @@ export default class ClassRoom extends Component {
 		if (this.state.showForm) {
 			return (
 				<Form
+					errors={this.state.errors}
 					classRoom={this.state.classRoom}
 					updateField={this.updateField}
 					save={this.save}

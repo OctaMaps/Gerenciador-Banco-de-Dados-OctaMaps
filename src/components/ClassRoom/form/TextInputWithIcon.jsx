@@ -1,7 +1,7 @@
 import React from "react"
 
 export default props => {
-	const { label, name, value, onChange, values, maxLength } = props
+	const { label, name, value, onChange, values, maxLength, style } = props
 	const spanStyle = {
 		padding: "4px",
 		fontSize: "110%"
@@ -26,7 +26,7 @@ export default props => {
 					<input
 						style={textInputStyle}
 						type="text"
-						className="form-control "
+						className="form-control"
 						name={name}
 						value={value}
 						onChange={onChange}
