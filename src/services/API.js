@@ -9,15 +9,15 @@ function API(url) {
 		return response.data
 	}
 
-	const remove = async (url, classRoom) => {
-		await axios["delete"](`${url}/${classRoom.id}`)
+	const remove = async (url, classroom) => {
+		await axios["delete"](`${url}/${classroom.id}`)
 	}
 
-	const save = async classRoomParam => {
-		const classRoom = classRoomParam
-		const method = classRoom.id ? "put" : "post"
-		const finalUrl = classRoom.id ? `${baseUrl}/${classRoom.id}` : baseUrl
-		const response = await axios[method](finalUrl, classRoom)
+	const save = async classroomParam => {
+		const classroom = classroomParam
+		const method = classroom.id ? "put" : "post"
+		const finalUrl = classroom.id ? `${baseUrl}/${classroom.id}` : baseUrl
+		const response = await axios[method](finalUrl, classroom)
 		return response
 	}
 

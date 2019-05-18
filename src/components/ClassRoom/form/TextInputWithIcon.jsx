@@ -24,7 +24,7 @@ export default props => {
 				<div className="input-group">
 					<div className="input-group-prepend">{renderIcons(values)}</div>
 					<input
-						style={textInputStyle}
+						style={Object.assign({}, textInputStyle, style)}
 						type="text"
 						className="form-control"
 						name={name}

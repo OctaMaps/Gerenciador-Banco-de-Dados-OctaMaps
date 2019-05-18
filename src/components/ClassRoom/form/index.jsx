@@ -20,27 +20,24 @@ export default props => {
 		numero_piso,
 		codigo_sala,
 		titulo_sala
-	} = props.classRoom
-
-	// const errors = [
-	// 	{
-	// 		title: "erro",
-	// 		fields: "titulo_campus"
-	// 	}
-	// ]
-
-	// Problemas para renderizar
+	} = props.classroom
 
 	const renderError = field => {
+		// Execução só uma vez
 		if (errors.length >= 1) {
-			const fieldsWithError = errors.filter(error =>
-				error.fields.includes(field)
-			)
+			const fieldsWithError = errors.reduce((accumulator, currentError) => {
+				const { fields } = currentError
+				accumulator = [...accumulator] + [...fields]
+				return accumulator
+			}, [])
 			const errorInputStyle = {
-				borderColor: "#cc0000",
-				boxShadow: "0 0 0 0.2rem #ff3333"
+				borderColor: "rgb(248, 215, 218)",
+				boxShadow: "0 0 0 0.2rem rgba(205, 50, 65, 0.7)",
+				backgroundColor: "rgb(248, 215, 218)"
 			}
-			if (fieldsWithError.includes(field)) return errorInputStyle
+			if (fieldsWithError.includes(field)) {
+				return errorInputStyle
+			}
 		} else {
 			return null
 		}
@@ -55,7 +52,7 @@ export default props => {
 	return (
 		<div>
 			{renderErrorAlert()}
-			<form className="form">
+			<form className="form" onSubmit={props.handleSubmit}>
 				<div className="row">
 					<Dropdown
 						style={renderError("titulo_bloco")}
@@ -95,11 +92,7 @@ export default props => {
 				</div>
 				<div className="row">
 					<div className="col-12 d-flex justify-content-end">
-						<button
-							type="submit"
-							onClick={() => props.save(props.classRoom)}
-							className="btn btn-primary"
-						>
+						<button type="submit" className="btn btn-primary">
 							{props.saveButtonText}
 						</button>
 						<button
