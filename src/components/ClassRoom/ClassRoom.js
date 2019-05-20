@@ -1,13 +1,14 @@
 import React, { Component } from "react"
 import ReactDOMServer from "react-dom/server"
 import Fuse from "fuse.js"
+import credentials from "../../credentials/credentials"
 import Main from "../templates/Main"
 import API from "../../services/API"
 import Form from "./Form"
 import Table from "./Table"
 import Filter from "./Filter"
 import TableOptions from "./TableOptions"
-const api = API("http://localhost:3001/classrooms")
+const api = API(credentials.env.classroomURL)
 
 const headerProps = {
 	icon: "book",
@@ -93,7 +94,7 @@ export default class Classroom extends Component {
 	state = { ...initialState }
 
 	async componentWillMount() {
-		const list = await api.get(api.baseUrl)
+		const list = await api.get()
 		this.setState({ initialList: list })
 		this.setState({ list })
 		this.listSort("id")
@@ -136,7 +137,7 @@ export default class Classroom extends Component {
 
 	remove = async classroom => {
 		try {
-			await api.remove(api.baseUrl, classroom)
+			await api.remove(classroom)
 			const list = this.state.list.filter(element => element !== classroom)
 			this.setState({ list })
 		} catch (error) {

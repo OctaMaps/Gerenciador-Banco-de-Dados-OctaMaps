@@ -2,21 +2,19 @@ import axios from "axios"
 import { saveAs } from "file-saver"
 
 function API(url) {
-	const baseUrl = url
-
-	const get = async url => {
+	const get = async () => {
 		const response = await axios["get"](url)
 		return response.data
 	}
 
-	const remove = async (url, classroom) => {
+	const remove = async classroom => {
 		await axios["delete"](`${url}/${classroom.id}`)
 	}
 
 	const save = async classroomParam => {
 		const classroom = classroomParam
 		const method = classroom.id ? "put" : "post"
-		const finalUrl = classroom.id ? `${baseUrl}/${classroom.id}` : baseUrl
+		const finalUrl = classroom.id ? `${url}/${classroom.id}` : url
 		const response = await axios[method](finalUrl, classroom)
 		return response
 	}
@@ -38,7 +36,7 @@ function API(url) {
 		get,
 		save,
 		remove,
-		baseUrl,
+		url,
 		fetchAndGetList
 	}
 }
