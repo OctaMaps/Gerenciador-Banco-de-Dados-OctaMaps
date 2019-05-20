@@ -1,7 +1,7 @@
 import React from "react"
 
 export default props => {
-	const { label, name, value, onChange, values, maxLength } = props
+	const { label, name, value, onChange, values, maxLength, style } = props
 	const spanStyle = {
 		padding: "4px",
 		fontSize: "110%"
@@ -24,9 +24,9 @@ export default props => {
 				<div className="input-group">
 					<div className="input-group-prepend">{renderIcons(values)}</div>
 					<input
-						style={textInputStyle}
+						style={Object.assign({}, textInputStyle, style)}
 						type="text"
-						className="form-control "
+						className="form-control"
 						name={name}
 						value={value}
 						onChange={onChange}

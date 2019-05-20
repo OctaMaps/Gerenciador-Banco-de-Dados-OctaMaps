@@ -11,7 +11,9 @@
 
 * {
 	box-sizing: border-box;
-	font-family: "Oswald", sans-serif;
+	font-family: "Open Sans", sans-serif;
+	/* font-family: "Oswald", sans-serif; */
+	/* font-family: "Roboto Slab", serif; */
 }
 
 .app {

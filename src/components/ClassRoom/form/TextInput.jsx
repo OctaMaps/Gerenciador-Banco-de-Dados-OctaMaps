@@ -1,12 +1,13 @@
 import React from "react"
 
 export default props => {
-	const { label, name, value, onChange } = props
+	const { label, name, value, onChange, style } = props
 	return (
 		<div className="col-12 col-md-6">
 			<div className="form-group">
 				<label htmlFor={name}>{label}</label>
 				<input
+					style={style}
 					type="text"
 					className="form-control"
 					name={name}

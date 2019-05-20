@@ -1,13 +1,14 @@
 import React, { Component } from "react"
 import ReactDOMServer from "react-dom/server"
 import Fuse from "fuse.js"
+import credentials from "../../credentials/credentials"
 import Main from "../templates/Main"
 import API from "../../services/API"
 import Form from "./Form"
 import Table from "./Table"
 import Filter from "./Filter"
 import TableOptions from "./TableOptions"
-const api = API("http://localhost:3001/classRooms")
+const api = API(credentials.env.classroomURL)
 
 const headerProps = {
 	icon: "book",
@@ -16,7 +17,7 @@ const headerProps = {
 }
 
 const initialState = {
-	classRoom: {
+	classroom: {
 		id: "",
 		titulo_bloco: "Bloco A",
 		numero_piso: "0",
@@ -48,7 +49,8 @@ const initialState = {
 	showTableOptions: true,
 	showTable: true,
 	showForm: false,
-	showFilter: false
+	showFilter: false,
+	errors: []
 }
 
 const thList = [
@@ -88,57 +90,61 @@ const fuseOptions = {
 	keys: ["titulo_bloco", "codigo_sala", "titulo_sala"]
 }
 
-export default class ClassRoom extends Component {
+export default class Classroom extends Component {
 	state = { ...initialState }
 
 	async componentWillMount() {
-		const list = await api.get(api.baseUrl)
+		const list = await api.get()
 		this.setState({ initialList: list })
 		this.setState({ list })
 		this.listSort("id")
 	}
 
 	clear = () => {
-		const { classRoom } = this.state
-		classRoom.codigo_sala = this.codigoSalaHandling(classRoom, "join")
-		this.setState({ classRoom })
-		this.setState({ classRoom: initialState.classRoom })
+		const { classroom } = this.state
+		classroom.codigo_sala = this.codigoSalaHandling(classroom, "join")
+		this.setState({ classroom })
+		this.setState({ classroom: initialState.classroom })
 		this.formToggle()
 		this.setState({ saveButtonText: initialState.saveButtonText })
 	}
 
-	save = async classRoom => {
-		try {
-			classRoom.codigo_sala = this.codigoSalaHandling(classRoom, "join")
-			const response = await api.save(classRoom)
-			const list = this.getUpdatedList(response.data)
-			this.setState({
-				list,
-				classRoom: initialState.classRoom,
-				saveButtonText: initialState.saveButtonText
-			})
-			this.formToggle()
-		} catch (error) {
-			throw new Error(error)
+	save = async () => {
+		const { classroom } = this.state
+		if (this.state.errors.length < 1) {
+			try {
+				classroom.codigo_sala = this.codigoSalaHandling(classroom, "join")
+				const response = await api.save(classroom)
+				const list = this.getUpdatedList(response.data)
+				this.setState({
+					list,
+					classroom: initialState.classroom,
+					saveButtonText: initialState.saveButtonText
+				})
+				this.formToggle()
+			} catch (error) {
+				throw new Error(error)
+			}
 		}
 	}
 
-	load = classRoom => {
-		classRoom.codigo_sala = this.codigoSalaHandling(classRoom, "slice")
-		this.setState({ classRoom })
+	load = classroom => {
+		classroom.codigo_sala = this.codigoSalaHandling(classroom, "slice")
+		this.setState({ classroom })
 		this.setState({ saveButtonText: "Salvar alterações" })
 		this.formToggle()
 	}
 
-	remove = async classRoom => {
+	remove = async classroom => {
 		try {
-			await api.remove(api.baseUrl, classRoom)
-			const list = this.state.list.filter(element => element !== classRoom)
+			await api.remove(classroom)
+			const list = this.state.list.filter(element => element !== classroom)
 			this.setState({ list })
 		} catch (error) {
 			throw new Error(error)
 		}
 	}
+
 	listOrderToggle = async state => {
 		if (state.listOrder === "increasing")
 			await this.setState({ listOrder: "decreasing" })
@@ -160,7 +166,8 @@ export default class ClassRoom extends Component {
 		this.setState({
 			showForm: !this.state.showForm,
 			showTable: !this.state.showTable,
-			showTableOptions: !this.state.showTableOptions
+			showTableOptions: !this.state.showTableOptions,
+			errors: []
 		})
 	}
 
@@ -177,10 +184,44 @@ export default class ClassRoom extends Component {
 		this.setState({ showFilter: !showFilter })
 	}
 
-	codigoSalaHandling = (classRoom, operation) => {
-		let { codigo_sala } = classRoom
+	handleSubmit = async event => {
+		event.preventDefault()
+		const valid = await this.formValidation()
+		if (valid) this.save()
+	}
+
+	formValidation = async () => {
+		await this.setState({ errors: [] })
+		const { classroom, errors } = this.state
+		const emptyKeys = this.emptyKeys(classroom)
+		if (emptyKeys.length >= 1) {
+			const fields = [...emptyKeys]
+			const error = {
+				id: 1,
+				title: "Todos os campos devem ser preenchidos",
+				fields
+			}
+			errors.push(error)
+			await this.setState({ errors })
+			return false
+		} else {
+			return true
+		}
+	}
+
+	emptyKeys = () => {
+		const { classroom } = this.state
+		const classroomKeys = Object.keys(classroom)
+		const emptyKeys = classroomKeys.filter(
+			key => !classroom[key] && key !== "id"
+		)
+		return emptyKeys
+	}
+
+	codigoSalaHandling = (classroom, operation) => {
+		let { codigo_sala } = classroom
 		if (operation === "join") {
-			const { numero_piso, titulo_bloco } = classRoom
+			const { numero_piso, titulo_bloco } = classroom
 			codigo_sala = this.addZeroToCodigoSala(codigo_sala)
 			const new_codigo_sala = titulo_bloco[6] + numero_piso + codigo_sala
 			return new_codigo_sala
@@ -204,9 +245,9 @@ export default class ClassRoom extends Component {
 		return codigo_sala
 	}
 
-	getUpdatedList = classRoom => {
-		const list = this.state.list.filter(el => el.id !== classRoom.id)
-		list.unshift(classRoom)
+	getUpdatedList = classroom => {
+		const list = this.state.list.filter(el => el.id !== classroom.id)
+		list.unshift(classroom)
 		return list
 	}
 
@@ -222,9 +263,10 @@ export default class ClassRoom extends Component {
 
 	updateField = async event => {
 		const { name, value } = event.target
-		const classRoom = { ...this.state.classRoom }
-		classRoom[name] = value
-		await this.setState({ classRoom })
+		const valueHandle = value.trim()
+		const classroom = { ...this.state.classroom }
+		classroom[name] = valueHandle
+		await this.setState({ classroom })
 	}
 
 	listSearch = term => {
@@ -348,9 +390,10 @@ export default class ClassRoom extends Component {
 		if (this.state.showForm) {
 			return (
 				<Form
-					classRoom={this.state.classRoom}
+					errors={this.state.errors}
+					classroom={this.state.classroom}
 					updateField={this.updateField}
-					save={this.save}
+					handleSubmit={this.handleSubmit}
 					clear={this.clear}
 					saveButtonText={this.state.saveButtonText}
 				/>
