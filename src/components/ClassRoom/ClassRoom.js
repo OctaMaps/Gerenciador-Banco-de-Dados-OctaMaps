@@ -1,14 +1,13 @@
 import React, { Component } from "react"
 import ReactDOMServer from "react-dom/server"
 import Fuse from "fuse.js"
-import credentials from "../../credentials/credentials"
 import Main from "../templates/Main"
 import API from "../../services/API"
 import Form from "./Form"
 import Table from "./Table"
 import Filter from "./Filter"
 import TableOptions from "./TableOptions"
-const api = API(credentials.env.classroomURL)
+const api = API()
 
 const headerProps = {
 	icon: "book",

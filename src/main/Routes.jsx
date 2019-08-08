@@ -1,15 +1,20 @@
 import React from "react"
 import { Switch, Route, Redirect } from "react-router"
 
-import Home from "../components/home/Home"
-import Classroom from "../components/Classroom/Classroom"
+import Login from "../components/Login/Login"
+import MainPage from "../components/MainPage"
+import { isAuthenticated } from "./auth"
 
 export default props => {
-	return (
-		<Switch>
-			<Route exact path="/" component={Home} />
-			<Route path="/salas" component={Classroom} />
-			<Redirect from="*" to="/" />
-		</Switch>
-	)
+	if (isAuthenticated()) {
+		return <MainPage />
+	}
+	if (!isAuthenticated()) {
+		return (
+			<Switch>
+				<Route path="/login" component={Login} />
+				<Redirect from="*" to={{ pathname: "/login", state: props.location }} />
+			</Switch>
+		)
+	}
 }

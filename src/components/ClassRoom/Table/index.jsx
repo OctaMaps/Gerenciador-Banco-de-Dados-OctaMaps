@@ -3,6 +3,7 @@ import Rows from "./Rows"
 import TableHeaders from "./TableHeaders"
 
 export default props => {
+	console.log(props.list)
 	return (
 		<div>
 			<table className="table mt-4">
