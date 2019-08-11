@@ -3,23 +3,22 @@ import { saveAs } from "file-saver"
 import credentials from "./../credentials"
 
 function api() {
-	const { classroomUrl, pdfUrl } = credentials.prod
+	const { classRoomUrl, pdfUrl } = credentials.prod
 	const get = async () => {
-		console.log("Link: ", classroomUrl)
-		const response = await axios.get(classroomUrl)
+		const response = await axios.get(classRoomUrl)
 		return response.data.result
 	}
 
 	const remove = async classroom => {
-		await axios["delete"](`${classroomUrl}/${classroom.id}`)
+		await axios["delete"](`${classRoomUrl}/${classroom.id}`)
 	}
 
 	const save = async classroomParam => {
 		const classroom = classroomParam
 		const method = classroom.id ? "put" : "post"
 		const finalUrl = classroom.id
-			? `${classroomUrl}/${classroom.id}`
-			: classroomUrl
+			? `${classRoomUrl}/${classroom.id}`
+			: classRoomUrl
 		const response = await axios[method](finalUrl, classroom)
 		return response
 	}
@@ -41,7 +40,7 @@ function api() {
 		get,
 		save,
 		remove,
-		classroomUrl,
+		classRoomUrl,
 		fetchAndGetList
 	}
 }

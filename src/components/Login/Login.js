@@ -1,4 +1,7 @@
 import React, { Component } from "react"
+import Auth from "../../main/auth"
+
+const auth = Auth()
 
 export default class Login extends Component {
 	state = {
@@ -20,12 +23,14 @@ export default class Login extends Component {
 		await this.setState({ [name]: valueHandle })
 	}
 
-	signin = () => {}
+	login = async () => {
+		await auth.signin(this.state.email, this.state.password)
+	}
 
 	render() {
 		return (
 			<div style={this.loginStyle}>
-				<form className="form" onSubmit={this.signin}>
+				<form className="form">
 					<div className="form-group">
 						<label htmlFor="email">Email</label>
 						<input
@@ -48,7 +53,13 @@ export default class Login extends Component {
 							onChange={this.updateField}
 						/>
 					</div>
-					<button type="submit" className="btn btn-primary">
+					<button
+						type="button"
+						onClick={async () => {
+							await this.login()
+						}}
+						className="btn btn-primary"
+					>
 						Fazer login
 					</button>
 				</form>
