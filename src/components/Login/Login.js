@@ -24,7 +24,8 @@ export default class Login extends Component {
 	}
 
 	login = async () => {
-		await auth.signin(this.state.email, this.state.password)
+		const response = await auth.signin(this.state.email, this.state.password)
+		return <p style={{ color: response.color }}>{response.message}</p>
 	}
 
 	render() {

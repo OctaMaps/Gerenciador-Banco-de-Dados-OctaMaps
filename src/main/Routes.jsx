@@ -7,10 +7,12 @@ import Auth from "./auth"
 
 const auth = Auth()
 export default props => {
-	if (auth.isAuthenticated()) {
+	const isAuthenticated = auth.isAuthenticated()
+	console.log(isAuthenticated)
+	if (isAuthenticated) {
 		return <MainPage />
 	}
-	if (!auth.isAuthenticated()) {
+	if (!isAuthenticated || isAuthenticated === undefined) {
 		return (
 			<Switch>
 				<Route path="/login" component={Login} />

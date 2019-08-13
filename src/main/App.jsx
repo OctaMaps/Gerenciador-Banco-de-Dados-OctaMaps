@@ -8,10 +8,10 @@ import Routes from "./Routes"
 
 export default props => {
 	return (
-		<BrowserRouter>
-			<div className="app">
+		<div className="app">
+			<BrowserRouter>
 				<Routes />
-			</div>
-		</BrowserRouter>
+			</BrowserRouter>
+		</div>
 	)
 }
