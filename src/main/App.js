@@ -5,13 +5,14 @@ import "font-awesome/css/font-awesome.min.css"
 import "./App.css"
 
 import Routes from "./Routes"
-
-export default props => {
+function App({ location }) {
 	return (
 		<div className="app">
 			<BrowserRouter>
-				<Routes />
+				<Routes location={location} />
 			</BrowserRouter>
 		</div>
 	)
 }
+
+export default App

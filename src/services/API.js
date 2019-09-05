@@ -1,26 +1,57 @@
 import axios from "axios"
 import { saveAs } from "file-saver"
 import credentials from "./../credentials"
+import getToken from "./token"
 
 function api() {
-	const { classRoomUrl, pdfUrl } = credentials.prod
+	const {
+		// classRoomUrlRead,
+		classroomUrl,
+		pdfUrl,
+		validateTokenUrl,
+		baseURL
+	} = credentials.prod
+
+	const isValidToken = async () => {
+		try {
+			const token = await getToken()
+			axios.defaults.headers.Authorization = "bearer " + token
+			axios.defaults.baseURL = baseURL
+			const response = await axios.post(validateTokenUrl)
+			return response.data.isValid
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
 	const get = async () => {
-		const response = await axios.get(classRoomUrl)
-		return response.data.result
+		try {
+			const response = await axios.get(classroomUrl)
+			return response.data.result
+		} catch (error) {
+			return new Error(error)
+		}
 	}
 
 	const remove = async classroom => {
-		await axios["delete"](`${classRoomUrl}/${classroom.id}`)
+		try {
+			await axios.delete(`${classroomUrl}/${classroom.id}`)
+		} catch (error) {
+			return new Error(error)
+		}
 	}
 
-	const save = async classroomParam => {
-		const classroom = classroomParam
+	const save = async classroom => {
 		const method = classroom.id ? "put" : "post"
 		const finalUrl = classroom.id
-			? `${classRoomUrl}/${classroom.id}`
-			: classRoomUrl
-		const response = await axios[method](finalUrl, classroom)
-		return response
+			? `${classroomUrl}/${classroom.id}`
+			: classroomUrl
+		try {
+			const response = await axios[method](finalUrl, classroom)
+			return response
+		} catch (error) {
+			return new Error(error)
+		}
 	}
 
 	const fetchAndGetList = async list => {
@@ -32,7 +63,7 @@ function api() {
 			const listBlob = new Blob([response.data], { type: "application/pdf" })
 			saveAs(listBlob, "list.pdf")
 		} catch (error) {
-			throw error
+			return new Error(error)
 		}
 	}
 
@@ -40,8 +71,9 @@ function api() {
 		get,
 		save,
 		remove,
-		classRoomUrl,
-		fetchAndGetList
+		classroomUrl,
+		fetchAndGetList,
+		isValidToken
 	}
 }
 

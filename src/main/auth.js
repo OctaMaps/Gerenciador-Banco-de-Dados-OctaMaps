@@ -1,6 +1,8 @@
 import axios from "axios"
-import credentials from "../credentials.json"
 import { get, set } from "idb-keyval"
+import API from "../services/API"
+import credentials from "../credentials.json"
+const api = API()
 
 const { authUrl, validateTokenUrl } = credentials.prod
 function auth() {
@@ -14,15 +16,15 @@ function auth() {
 					password
 				}
 			})
-			const { token } = response.data
+			const { token, name } = response.data
 			try {
 				await set("token", token)
+				await set("name", name)
 				return { message: "Sucesso!", color: "green" }
 			} catch (error) {
 				return { message: "Problemas para armazenar o Token", color: "red" }
 			}
 		} catch (error) {
-			console.log("error: ", error.response)
 			const { status } = error.response
 			if (status === 400) {
 				const { email, password } = error.response.data
@@ -45,19 +47,8 @@ function auth() {
 
 	const isAuthenticated = async () => {
 		const token = await get("token")
-		if (token) {
-			const response = await axios({
-				method: "post",
-				url: validateTokenUrl,
-				data: {
-					token
-				}
-			})
-			console.log(response)
-			return true
-		} else {
-			return false // Parou aqui
-		}
+		const isValid = await api.isValidToken(token)
+		return isValid
 	}
 
 	return { signin, isAuthenticated }

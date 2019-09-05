@@ -21,7 +21,8 @@ const initialState = {
 		titulo_bloco: "Bloco A",
 		numero_piso: "0",
 		codigo_sala: "",
-		titulo_sala: ""
+		titulo_sala: "",
+		titulo_campus: "Octayde Jorge Da Silva"
 	},
 	initialList: [],
 	list: [],
@@ -112,6 +113,8 @@ export default class Classroom extends Component {
 		const { classroom } = this.state
 		if (this.state.errors.length < 1) {
 			try {
+				if (classroom.numero_piso)
+					classroom.numero_piso = String(classroom.numero_piso)
 				classroom.codigo_sala = this.codigoSalaHandling(classroom, "join")
 				const response = await api.save(classroom)
 				const list = this.getUpdatedList(response.data)
@@ -122,7 +125,8 @@ export default class Classroom extends Component {
 				})
 				this.formToggle()
 			} catch (error) {
-				throw new Error(error)
+				console.log(error)
+				return new Error(error)
 			}
 		}
 	}
@@ -140,7 +144,8 @@ export default class Classroom extends Component {
 			const list = this.state.list.filter(element => element !== classroom)
 			this.setState({ list })
 		} catch (error) {
-			throw new Error(error)
+			console.log(error)
+			return new Error(error)
 		}
 	}
 
@@ -245,9 +250,15 @@ export default class Classroom extends Component {
 	}
 
 	getUpdatedList = classroom => {
-		const list = this.state.list.filter(el => el.id !== classroom.id)
-		list.unshift(classroom)
-		return list
+		try {
+			if (classroom) console.log("classroom list: ", classroom)
+			const list = this.state.list.filter(el => el.id !== classroom.id)
+			list.unshift(classroom)
+			return list
+		} catch (error) {
+			console.log(error)
+			throw error
+		}
 	}
 
 	updateSearchQuery = event => {

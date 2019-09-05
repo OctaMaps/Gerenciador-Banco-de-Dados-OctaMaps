@@ -1,10 +1,11 @@
 import React from "react"
 import Main from "../templates/Main"
+import { get, set } from "idb-keyval"
 
 export default props => {
 	return (
 		<Main icon="home" title="Inicio" subtitle="Sistema de Gestão do Octa Maps">
-			<div className="display-4">Bem-Vindo</div>
+			<div className="display-4">Bem-Vindo {props.name}</div>
 			<p>
 				Lorem Ipsum is simply dummy text of the printing and typesetting
 				industry. Lorem Ipsum has been the industry's standard dummy text ever
