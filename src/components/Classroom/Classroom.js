@@ -117,7 +117,7 @@ export default class Classroom extends Component {
 					classroom.numero_piso = String(classroom.numero_piso)
 				classroom.codigo_sala = this.codigoSalaHandling(classroom, "join")
 				const response = await api.save(classroom)
-				const list = this.getUpdatedList(response.data)
+				const list = this.getUpdatedList(response)
 				this.setState({
 					list,
 					classroom: initialState.classroom,
@@ -251,8 +251,10 @@ export default class Classroom extends Component {
 
 	getUpdatedList = classroom => {
 		try {
-			if (classroom) console.log("classroom list: ", classroom)
-			const list = this.state.list.filter(el => el.id !== classroom.id)
+			// if (classroom) console.log("classroom id: ", classroom.id_sala)
+			const list = this.state.list.filter(el => {
+				return el.id !== classroom.id_sala
+			})
 			list.unshift(classroom)
 			return list
 		} catch (error) {

@@ -48,7 +48,8 @@ function api() {
 			: classroomUrl
 		try {
 			const response = await axios[method](finalUrl, classroom)
-			return response
+			console.log(response.data)
+			return response.data
 		} catch (error) {
 			return new Error(error)
 		}

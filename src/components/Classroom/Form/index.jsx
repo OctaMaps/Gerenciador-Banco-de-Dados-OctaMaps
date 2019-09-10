@@ -36,6 +36,7 @@ export default props => {
 				backgroundColor: "rgb(248, 215, 218)"
 			}
 			if (fieldsWithError.includes(field)) {
+				console.log(field)
 				return errorInputStyle
 			}
 		} else {
