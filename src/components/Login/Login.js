@@ -35,15 +35,22 @@ export default class Login extends Component {
 
 	login = async () => {
 		const response = await auth.signin(this.state.email, this.state.password)
-		const { color, message } = response
-		if (color && message) {
-			let colorOfMessage
-			if (color === "red") {
-				colorOfMessage = "#fc0f03"
+		try {
+			const { color, message } = response
+			if (color && message) {
+				let colorOfMessage
+				if (color === "red") {
+					colorOfMessage = "#fc0f03"
+				}
+				if (color === "green") {
+					colorOfMessage = "#32e809"
+				}
+				await this.setState({ message, colorOfMessage })
+				this.setState({ showMessage: true })
 			}
-			if (color === "green") {
-				colorOfMessage = "#32e809"
-			}
+		} catch (error) {
+			const message = "Erro interno - Servidor Indisponível"
+			const colorOfMessage = "#fc0f03"
 			await this.setState({ message, colorOfMessage })
 			this.setState({ showMessage: true })
 		}
