@@ -22,25 +22,22 @@ function auth() {
 				await set("name", name)
 				return { message: "Sucesso!", color: "green" }
 			} catch (error) {
-				return { message: "Problemas para armazenar o Token", color: "red" }
+				return { message: "Problemas internos com a aplicação", color: "red" }
 			}
 		} catch (error) {
-			const { status } = error.response
-			if (status === 400) {
-				const { email, password } = error.response.data
-				if (email)
-					return { message: "Campo de Email não preenchido", color: "red" }
-				if (password)
-					return { message: "Campo de senha não preenchido", color: "red" }
-				if (email && password)
+			try {
+				const { status } = error.response
+				if (status === 400) {
 					return {
 						message: "Os campos de Email e senha precisam ser preenchidos",
 						color: "red"
 					}
-			}
-			if (status === 401 || status === 404) {
-				const errorMessage = error.response.data.error
-				return { message: errorMessage, color: "red" }
+				}
+				if (status === 401 || status === 404) {
+					return { message: "Usuário ou senha incorreta", color: "red" }
+				}
+			} catch (error) {
+				return { message: "Servidor Indisponível", color: "red" }
 			}
 		}
 	}

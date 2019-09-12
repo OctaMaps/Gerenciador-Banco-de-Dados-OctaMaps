@@ -19,9 +19,7 @@ function api() {
 			axios.defaults.baseURL = baseURL
 			const response = await axios.post(validateTokenUrl)
 			return response.data.isValid
-		} catch (error) {
-			console.log(error)
-		}
+		} catch (error) {}
 	}
 
 	const get = async () => {
