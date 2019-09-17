@@ -50,7 +50,9 @@ const initialState = {
 	showTable: true,
 	showForm: false,
 	showFilter: false,
-	errors: []
+	showErrorTable: false,
+	errors: [],
+	errorsTable: []
 }
 
 const thList = [
@@ -94,10 +96,24 @@ export default class Classroom extends Component {
 	state = { ...initialState }
 
 	async componentWillMount() {
-		const list = await api.get()
-		this.setState({ initialList: list })
-		this.setState({ list })
-		this.listSort("id")
+		try {
+			const list = await api.get()
+			this.setState({ initialList: list })
+			this.setState({ list })
+			this.listSort("id")
+		} catch (error) {
+			if (error === 401) {
+				const error = { title: "Sem permissão para essa operação" }
+				const { errorsTable } = this.state
+				errorsTable.push(error)
+				this.formToggle()
+				await this.setState({ errorsTable, showErrorTable: true })
+			}
+			const { errorsTable } = this.state
+			errorsTable.push({ title: error.message ? error.message : error })
+			this.formToggle()
+			await this.setState({ errorsTable, showErrorTable: true })
+		}
 	}
 
 	clear = () => {
@@ -117,16 +133,26 @@ export default class Classroom extends Component {
 					classroom.numero_piso = String(classroom.numero_piso)
 				classroom.codigo_sala = this.codigoSalaHandling(classroom, "join")
 				const response = await api.save(classroom)
-
 				const list = this.getUpdatedList(classroom.id ? classroom : response)
 				this.setState({
 					list,
 					classroom: initialState.classroom,
 					saveButtonText: initialState.saveButtonText
 				})
+				await this.setState({ errors: [] })
 				this.formToggle()
 			} catch (error) {
-				return new Error(error)
+				if (error === 401) {
+					const error = { title: "Sem permissão para essa operação" }
+					const { errorsTable } = this.state
+					errorsTable.push(error)
+					this.formToggle()
+					await this.setState({ errorsTable, showErrorTable: true })
+				}
+				const { errorsTable } = this.state
+				errorsTable.push({ title: error.message ? error.message : error })
+				this.formToggle()
+				await this.setState({ errorsTable, showErrorTable: true })
 			}
 		}
 	}
@@ -144,7 +170,17 @@ export default class Classroom extends Component {
 			const list = this.state.list.filter(element => element !== classroom)
 			this.setState({ list })
 		} catch (error) {
-			return new Error(error)
+			if (error === 401) {
+				const error = { title: "Sem permissão para essa operação" }
+				const { errorsTable } = this.state
+				errorsTable.push(error)
+				this.formToggle()
+				await this.setState({ errorsTable, showErrorTable: true })
+			}
+			const { errorsTable } = this.state
+			errorsTable.push({ title: error.message ? error.message : error })
+			this.formToggle()
+			await this.setState({ errorsTable, showErrorTable: true })
 		}
 	}
 
@@ -200,7 +236,6 @@ export default class Classroom extends Component {
 		if (emptyKeys.length >= 1) {
 			const fields = [...emptyKeys]
 			const error = {
-				id: 1,
 				title: "Todos os campos devem ser preenchidos",
 				fields
 			}
@@ -410,9 +445,23 @@ export default class Classroom extends Component {
 		}
 	}
 
+	renderErrorTable = () => {
+		if (this.state.showErrorTable) {
+			const errors = this.state.errorsTable
+			const renderErrors = errors => errors.map(error => <li>{error.title}</li>)
+			return (
+				<div className="alert alert-danger">
+					<h1>Erro!</h1>
+					<ul>{renderErrors(errors)}</ul>
+				</div>
+			)
+		}
+	}
+
 	render() {
 		return (
 			<Main {...headerProps}>
+				{this.renderErrorTable()}
 				{this.renderTableOptions()}
 				{this.renderFilter()}
 				{this.renderForm()}

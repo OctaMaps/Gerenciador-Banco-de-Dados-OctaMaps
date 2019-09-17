@@ -1,6 +1,5 @@
 import React from "react"
 import Main from "../templates/Main"
-import { get, set } from "idb-keyval"
 
 export default props => {
 	return (

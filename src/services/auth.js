@@ -1,25 +1,26 @@
 import axios from "axios"
 import { get, set } from "idb-keyval"
-import API from "../services/API"
+import API from "./API"
 import credentials from "../credentials.json"
 const api = API()
 
-const { authUrl, validateTokenUrl } = credentials.prod
+const { authURL } = credentials.prod
 function auth() {
 	const signin = async (email, password) => {
 		try {
 			const response = await axios({
 				method: "post",
-				url: authUrl,
+				url: authURL,
 				data: {
 					email,
 					password
 				}
 			})
-			const { token, name } = response.data
+			const { token, name, right } = response.data
 			try {
 				await set("token", token)
 				await set("name", name)
+				await set("right", right)
 				return { message: "Sucesso!", color: "green" }
 			} catch (error) {
 				return { message: "Problemas internos com a aplicação", color: "red" }
