@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import Auth from "../../main/auth"
+import Auth from "../../services/auth"
 
 const auth = Auth()
 
