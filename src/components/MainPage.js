@@ -4,6 +4,7 @@ import { Switch, Route, Redirect } from "react-router"
 import Home from "./home/Home"
 import Classroom from "./Classroom/Classroom"
 import Exit from "./Exit/Exit"
+import User from "./User/User"
 import Logo from "./templates/Logo"
 import Nav from "./templates/Nav"
 import Footer from "./templates/Footer"
@@ -17,6 +18,7 @@ export default props => {
 			<Switch>
 				<Route exact path="/" component={props => <Home name={name} />} />
 				<Route path="/salas" component={Classroom} />
+				<Route path="/usuarios" component={User} />
 				<Route path="/sair" component={props => <Exit {...props} />} />
 				<Redirect to="/" />
 			</Switch>

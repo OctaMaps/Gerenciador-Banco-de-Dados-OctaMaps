@@ -1,12 +1,17 @@
 import React, { Component } from "react"
 import ReactDOMServer from "react-dom/server"
 import Fuse from "fuse.js"
+import exists from "../../utils/exists"
 import Main from "../templates/Main"
 import API from "../../services/API"
-import Form from "./Form"
-import Table from "./Table"
+import Form from "../Form"
+import Table from "../Table"
 import Filter from "./Filter"
-import TableOptions from "./TableOptions"
+import TableOptions from "../TableOptions"
+import ErrorTable from "../ErrorTable"
+import updateFieldUtil from "../../utils/updateField"
+import formValidationUtil from "../../utils/formValidation"
+import getUpdatedList from "../../utils/getUpdatedList"
 const api = API()
 
 const headerProps = {
@@ -83,6 +88,16 @@ const thList = [
 	}
 ]
 
+const tituloBlocoList = [
+	"Bloco A",
+	"Bloco B",
+	"Bloco C",
+	"Bloco D",
+	"Bloco E",
+	"Bloco F"
+]
+const numeroPisoList = ["0", "1", "2"]
+
 const fuseOptions = {
 	threshold: 0.6,
 	location: 0,
@@ -95,23 +110,49 @@ const fuseOptions = {
 export default class Classroom extends Component {
 	state = { ...initialState }
 
+	fieldList = [
+		{
+			type: "Dropdown",
+			values: tituloBlocoList,
+			label: "Titulo do Bloco",
+			name: "titulo_bloco"
+		},
+		{
+			type: "Dropdown",
+			values: numeroPisoList,
+			label: "Número do Piso",
+			name: "numero_piso"
+		},
+		{
+			type: "TextInputWithIcon",
+			label: "Código da Sala",
+			name: "codigo_sala",
+			maxLength: 3
+		},
+		{
+			type: "TextInput",
+			label: "Titulo da Sala",
+			name: "titulo_sala"
+		}
+	]
+
 	async componentWillMount() {
 		try {
-			const list = await api.get()
+			const list = await api.classroom.get()
 			this.setState({ initialList: list })
 			this.setState({ list })
 			this.listSort("id")
 		} catch (error) {
-			if (error === 401) {
-				const error = { title: "Sem permissão para essa operação" }
-				const { errorsTable } = this.state
-				errorsTable.push(error)
-				this.formToggle()
-				await this.setState({ errorsTable, showErrorTable: true })
+			let errorTitle = { title: "Undefined error, please contact the admin" }
+			if (error.status && error.statusText) {
+				const errorString = `${error.status}: ${error.statusText}`
+				errorTitle = { title: errorString }
 			}
 			const { errorsTable } = this.state
-			errorsTable.push({ title: error.message ? error.message : error })
-			this.formToggle()
+			if (!errorsTable.includes(errorTitle))
+				if (!exists(errorTitle, errorsTable, "title"))
+					errorsTable.push(errorTitle)
+			if (this.state.showForm) this.formToggle()
 			await this.setState({ errorsTable, showErrorTable: true })
 		}
 	}
@@ -132,8 +173,12 @@ export default class Classroom extends Component {
 				if (classroom.numero_piso)
 					classroom.numero_piso = String(classroom.numero_piso)
 				classroom.codigo_sala = this.codigoSalaHandling(classroom, "join")
-				const response = await api.save(classroom)
-				const list = this.getUpdatedList(classroom.id ? classroom : response)
+				classroom.titulo_campus = "Octayde Jorge Da Silva"
+				const response = await api.classroom.save(classroom)
+				const list = getUpdatedList(
+					classroom.id ? classroom : response,
+					this.state.list
+				)
 				this.setState({
 					list,
 					classroom: initialState.classroom,
@@ -145,7 +190,8 @@ export default class Classroom extends Component {
 				if (error === 401) {
 					const error = { title: "Sem permissão para essa operação" }
 					const { errorsTable } = this.state
-					errorsTable.push(error)
+					if (!errorsTable.includes(error))
+						if (!exists(error, errorsTable, "title")) errorsTable.push(error)
 					this.formToggle()
 					await this.setState({ errorsTable, showErrorTable: true })
 				}
@@ -159,28 +205,31 @@ export default class Classroom extends Component {
 
 	load = classroom => {
 		classroom.codigo_sala = this.codigoSalaHandling(classroom, "slice")
+		classroom.numero_piso = classroom.numero_piso.toString()
 		this.setState({ classroom })
 		this.setState({ saveButtonText: "Salvar alterações" })
+		if (!this.state.showForm) this.setState({ errors: [], errorsTable: [] })
 		this.formToggle()
 	}
 
 	remove = async classroom => {
 		try {
-			await api.remove(classroom)
+			await api.classroom.remove(classroom)
 			const list = this.state.list.filter(element => element !== classroom)
 			this.setState({ list })
 		} catch (error) {
 			if (error === 401) {
 				const error = { title: "Sem permissão para essa operação" }
 				const { errorsTable } = this.state
-				errorsTable.push(error)
+				if (!errorsTable.includes(error))
+					if (!exists(error, errorsTable, "title")) errorsTable.push(error)
 				this.formToggle()
-				await this.setState({ errorsTable, showErrorTable: true })
+				this.setState({ errorsTable, showErrorTable: true })
 			}
 			const { errorsTable } = this.state
 			errorsTable.push({ title: error.message ? error.message : error })
 			this.formToggle()
-			await this.setState({ errorsTable, showErrorTable: true })
+			this.setState({ errorsTable, showErrorTable: true })
 		}
 	}
 
@@ -230,30 +279,13 @@ export default class Classroom extends Component {
 	}
 
 	formValidation = async () => {
-		await this.setState({ errors: [] })
 		const { classroom, errors } = this.state
-		const emptyKeys = this.emptyKeys(classroom)
-		if (emptyKeys.length >= 1) {
-			const fields = [...emptyKeys]
-			const error = {
-				title: "Todos os campos devem ser preenchidos",
-				fields
-			}
-			errors.push(error)
-			await this.setState({ errors })
+		const { isValid, formErrors } = await formValidationUtil(classroom, errors)
+		if (!isValid) {
+			this.setState({ errors: formErrors })
 			return false
-		} else {
-			return true
 		}
-	}
-
-	emptyKeys = () => {
-		const { classroom } = this.state
-		const classroomKeys = Object.keys(classroom)
-		const emptyKeys = classroomKeys.filter(
-			key => !classroom[key] && key !== "id"
-		)
-		return emptyKeys
+		if (isValid) return true
 	}
 
 	codigoSalaHandling = (classroom, operation) => {
@@ -283,18 +315,6 @@ export default class Classroom extends Component {
 		return codigo_sala
 	}
 
-	getUpdatedList = classroom => {
-		try {
-			const list = this.state.list.filter(el => {
-				return el.id !== classroom.id
-			})
-			list.unshift(classroom)
-			return list
-		} catch (error) {
-			throw error
-		}
-	}
-
 	updateSearchQuery = event => {
 		const searchQuery = event.target.value
 		this.setState({ searchQuery })
@@ -306,11 +326,8 @@ export default class Classroom extends Component {
 	}
 
 	updateField = async event => {
-		const { name, value } = event.target
-		const valueHandle = value.trim()
-		const classroom = { ...this.state.classroom }
-		classroom[name] = valueHandle
-		await this.setState({ classroom })
+		const classroom = await updateFieldUtil(event, this.state.classroom)
+		this.setState({ classroom })
 	}
 
 	listSearch = term => {
@@ -387,7 +404,7 @@ export default class Classroom extends Component {
 				load={this.load}
 			/>
 		)
-		api.fetchAndGetList(html)
+		api.classroom.fetchAndGetList(html)
 	}
 
 	renderTableOptions = () => {
@@ -399,6 +416,11 @@ export default class Classroom extends Component {
 					searchQuery={this.state.searchQuery}
 					searchOnChange={this.updateSearchQuery}
 					generatePDF={this.generatePDF}
+					showAddButton={true}
+					showFilterButton={true}
+					showPrintButton={true}
+					showSearchBar={true}
+					addButtonText={"Adicionar sala"}
 				/>
 			)
 		}
@@ -435,11 +457,12 @@ export default class Classroom extends Component {
 			return (
 				<Form
 					errors={this.state.errors}
-					classroom={this.state.classroom}
 					updateField={this.updateField}
 					handleSubmit={this.handleSubmit}
 					clear={this.clear}
 					saveButtonText={this.state.saveButtonText}
+					fieldState={this.state.classroom}
+					fieldList={this.fieldList}
 				/>
 			)
 		}
@@ -447,14 +470,8 @@ export default class Classroom extends Component {
 
 	renderErrorTable = () => {
 		if (this.state.showErrorTable) {
-			const errors = this.state.errorsTable
-			const renderErrors = errors => errors.map(error => <li>{error.title}</li>)
-			return (
-				<div className="alert alert-danger">
-					<h1>Erro!</h1>
-					<ul>{renderErrors(errors)}</ul>
-				</div>
-			)
+			const { errorsTable } = this.state
+			return <ErrorTable errorsTable={errorsTable} />
 		}
 	}
 
