@@ -5,11 +5,11 @@ import getToken from "./token"
 
 function api() {
 	const {
-		// classRoomUrlRead,
 		classroomURL,
 		pdfURL,
 		validateTokenURL,
-		baseURL
+		baseURL,
+		userURL
 	} = credentials.prod
 
 	const isValidToken = async () => {
@@ -22,20 +22,21 @@ function api() {
 		} catch (error) {}
 	}
 
-	const get = async () => {
+	const getClassroom = async () => {
 		try {
 			const response = await axios.get(classroomURL)
 			return response.data.result
 		} catch (error) {
 			if (error.response.status) {
-				const { status } = error.response
-				throw status
+				const { status, statusText } = error.response
+				const errorObject = { status, statusText }
+				throw errorObject
 			}
-			return new Error(error)
+			throw Error(error)
 		}
 	}
 
-	const remove = async classroom => {
+	const removeClassroom = async classroom => {
 		try {
 			await axios.delete(`${classroomURL}/${classroom.id}`)
 		} catch (error) {
@@ -47,16 +48,13 @@ function api() {
 		}
 	}
 
-	const save = async classroom => {
+	const saveClassroom = async classroom => {
 		const method = classroom.id ? "put" : "post"
 		const finalUrl = classroom.id
 			? `${classroomURL}/${classroom.id}`
 			: classroomURL
-		// const finalUrl = "asdasdsadadsad"
 		try {
 			const response = await axios[method](finalUrl, classroom)
-			if (response.status) {
-			}
 			return classroom.id ? classroom : response.data.classroom[0]
 		} catch (error) {
 			if (error.response.status) {
@@ -84,12 +82,66 @@ function api() {
 		}
 	}
 
+	const getUser = async () => {
+		try {
+			const response = await axios.get(userURL)
+			return response.data.result
+		} catch (error) {
+			if (error.response.status) {
+				const { status } = error.response
+				throw status
+			}
+			return new Error(error)
+		}
+	}
+
+	const saveUser = async user => {
+		const method = user.id ? "put" : "post"
+		const finalUrl = user.id ? `${userURL}/${user.id}` : userURL
+		try {
+			const response = await axios[method](finalUrl, user)
+			if (!user.id) {
+				user.id = response.data.id
+			}
+			return user
+		} catch (error) {
+			console.log(error.response)
+			if (error.response.status) {
+				const { status } = error.response
+				throw status
+			}
+			return new Error(error)
+		}
+	}
+
+	const removeUser = async user => {
+		try {
+			await axios.delete(`${userURL}/${user.id}`)
+		} catch (error) {
+			if (error.response.status) {
+				const { status } = error.response
+				throw status
+			}
+			return new Error(error)
+		}
+	}
+
+	const classroom = {
+		save: saveClassroom,
+		remove: removeClassroom,
+		get: getClassroom,
+		fetchAndGetList
+	}
+
+	const user = {
+		save: saveUser,
+		remove: removeUser,
+		get: getUser
+	}
+
 	return {
-		get,
-		save,
-		remove,
-		classroomURL,
-		fetchAndGetList,
+		classroom,
+		user,
 		isValidToken
 	}
 }
