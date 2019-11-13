@@ -13,8 +13,12 @@ export default props => {
 					<i className="fa fa-book fa-fw" /> Salas
 				</NavLink>
 				<NavLink activeClassName="active-link" to="/usuarios">
-					<i className="fa fa-user fa-fw" />
+					<i className="fa fa-users fa-fw" />
 					Usuários
+				</NavLink>
+				<NavLink activeClassName="active-link" to="/conta">
+					<i className="fa fa-user-circle fa-fw" />
+					Conta
 				</NavLink>
 				<NavLink activeClassName="active-link" to="/sair">
 					<i className="fa fa-times fa-fw" /> Sair

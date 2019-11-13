@@ -285,7 +285,10 @@ export default class Classroom extends Component {
 			this.setState({ errors: formErrors })
 			return false
 		}
-		if (isValid) return true
+		if (isValid) {
+			this.setState({ errors: [] })
+			return true
+		}
 	}
 
 	codigoSalaHandling = (classroom, operation) => {

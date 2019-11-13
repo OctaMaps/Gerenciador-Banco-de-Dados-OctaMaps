@@ -3,14 +3,18 @@ import "./Header.css"
 
 // Icon e title inutilizados
 
+const titleStyle = {
+	fontWeight: "bold"
+}
+
 export default props => {
 	return (
 		<header className="header flex-column">
-			<h1 className="mt-3 lead">
-				{/* <i className={`fa fa-${props.icon} fa-fw`} /> */}
-				{props.subtitle}
+			<h1 className="mt-3 lead" style={titleStyle}>
+				<i className={`fa fa-${props.icon} fa-fw`} />
+				{props.title}
 			</h1>
-			{/* <p className="lead text-muted">{props.subtitle}</p> */}
+			<h3 className="mt-3 lead">{props.subtitle}</h3>
 		</header>
 	)
 }

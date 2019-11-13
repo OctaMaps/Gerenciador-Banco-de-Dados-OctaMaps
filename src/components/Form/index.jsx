@@ -2,11 +2,19 @@ import React from "react"
 import TextInput from "./TextInput"
 import Dropdown from "./Dropdown"
 import TextInputWithIcon from "./TextInputWithIcon"
-import ErrorAlert from "../Classroom/ErrorAlert"
+import Password from "./Password"
+import ErrorAlert from "./ErrorAlert"
+import WarningAlert from "./WarningAlert"
 
 export default props => {
-	const { errors, fieldState } = props
+	const { errors, fieldState, warnings } = props
 
+	const renderClearButton = () => {
+		if (props.clearButtonText) {
+			return props.clearButtonText
+		}
+		return "Cancelar"
+	}
 	const renderFields = fieldList => {
 		return fieldList.map(field => {
 			let values
@@ -50,17 +58,29 @@ export default props => {
 							maxLength={maxLength}
 						/>
 					)
+				case "Password":
+					return (
+						<Password
+							style={renderError(name)}
+							label={label}
+							name={name}
+							value={fieldState[name]}
+							onChange={event => props.updateField(event)}
+						/>
+					)
 				default:
 					return <></>
 			}
 		})
 	}
-
+	// Arrumar erro
 	const renderError = field => {
 		if (errors.length >= 1) {
 			const fieldsWithError = errors.reduce((accumulator, currentError) => {
 				const { fields } = currentError
-				accumulator = [...accumulator] + [...fields]
+				if (fields) accumulator = [...accumulator] + [...fields]
+				// console.log(`Acumulador: ${accumulator}`)
+				// console.log(`fields: ${fields}`)
 				return accumulator
 			}, [])
 			const errorInputStyle = {
@@ -77,8 +97,14 @@ export default props => {
 	}
 
 	const renderErrorAlert = () => {
-		if (errors.length >= 1) {
+		if (errors && errors.length > 0) {
 			return <ErrorAlert errors={errors} />
+		}
+	}
+
+	const renderWarningAlert = warnings => {
+		if (warnings && warnings.length > 0) {
+			return <WarningAlert warnings={warnings} />
 		}
 	}
 
@@ -97,11 +123,12 @@ export default props => {
 							className="btn btn-secondary ml-2"
 							onClick={() => props.clear()}
 						>
-							Cancelar
+							{renderClearButton()}
 						</button>
 					</div>
 				</div>
 			</form>
+			{renderWarningAlert(warnings)}
 		</div>
 	)
 }

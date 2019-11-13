@@ -43,7 +43,7 @@ const thList = [
 ]
 
 const headerProps = {
-	icon: "user",
+	icon: "users",
 	title: "Usuários",
 	subtitle: "Listagem de usuários registrados"
 }
@@ -209,7 +209,10 @@ export default class User extends Component {
 			this.setState({ errors: formErrors })
 			return false
 		}
-		if (isValid) return true
+		if (isValid) {
+			this.setState({ errors: [] })
+			return true
+		}
 	}
 
 	listOrderToggle = async state => {

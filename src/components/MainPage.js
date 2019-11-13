@@ -5,6 +5,7 @@ import Home from "./home/Home"
 import Classroom from "./Classroom/Classroom"
 import Exit from "./Exit/Exit"
 import User from "./User/User"
+import Account from "./Account/Account"
 import Logo from "./templates/Logo"
 import Nav from "./templates/Nav"
 import Footer from "./templates/Footer"
@@ -19,6 +20,7 @@ export default props => {
 				<Route exact path="/" component={props => <Home name={name} />} />
 				<Route path="/salas" component={Classroom} />
 				<Route path="/usuarios" component={User} />
+				<Route path="/conta" component={Account} />
 				<Route path="/sair" component={props => <Exit {...props} />} />
 				<Redirect to="/" />
 			</Switch>
