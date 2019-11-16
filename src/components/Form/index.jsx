@@ -79,8 +79,6 @@ export default props => {
 			const fieldsWithError = errors.reduce((accumulator, currentError) => {
 				const { fields } = currentError
 				if (fields) accumulator = [...accumulator] + [...fields]
-				// console.log(`Acumulador: ${accumulator}`)
-				// console.log(`fields: ${fields}`)
 				return accumulator
 			}, [])
 			const errorInputStyle = {

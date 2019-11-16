@@ -4,16 +4,17 @@ import { get, set } from "idb-keyval"
 
 import Login from "../components/Login/Login"
 import MainPage from "../components/MainPage"
-import Auth from "../services/auth"
+import API from "../services/API"
+
+const api = API()
 
 export default class Routes extends Component {
 	state = { isAuthenticated: false, name: "" }
-	componentWillMount() {
-		const auth = Auth()
-		auth
-			.isAuthenticated()
-			.then(isAuthenticated => this.setState({ isAuthenticated }))
-		get("name").then(name => this.setState({ name }))
+	async componentWillMount() {
+		const isAuthenticated = await api.auth.isValidToken()
+		const name = await get("name")
+		this.setState({ isAuthenticated })
+		this.setState({ name })
 	}
 	render() {
 		const { isAuthenticated } = this.state

@@ -1,7 +1,7 @@
 import React, { Component } from "react"
-import Auth from "../../services/auth"
+import API from "../../services/API"
 
-const auth = Auth()
+const api = API()
 
 export default class Login extends Component {
 	state = {
@@ -34,7 +34,10 @@ export default class Login extends Component {
 	}
 
 	login = async () => {
-		const response = await auth.signin(this.state.email, this.state.password)
+		const response = await api.auth.signin(
+			this.state.email,
+			this.state.password
+		)
 		try {
 			const { color, message } = response
 			if (color && message) {

@@ -4,7 +4,6 @@ const getUpdatedList = (item, list) => {
 			return el.id !== item.id
 		})
 		filteredList.unshift(item)
-		console.log(filteredList)
 		return filteredList
 	} catch (error) {
 		throw error

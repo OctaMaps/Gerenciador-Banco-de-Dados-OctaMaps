@@ -142,6 +142,7 @@ export default class Classroom extends Component {
 			this.setState({ initialList: list })
 			this.setState({ list })
 			this.listSort("id")
+			api.refreshToken()
 		} catch (error) {
 			let errorTitle = { title: "Undefined error, please contact the admin" }
 			if (error.status && error.statusText) {
