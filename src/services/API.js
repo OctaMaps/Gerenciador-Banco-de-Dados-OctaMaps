@@ -51,6 +51,7 @@ function api() {
 	const getClassroom = async () => {
 		try {
 			const response = await axios.get(classroomURL)
+			refreshToken(axios)
 			return response.data.result
 		} catch (error) {
 			if (error.response.status === 401) {
@@ -68,7 +69,6 @@ function api() {
 				const errorObject = { status, statusText }
 				throw errorObject
 			}
-			await refreshToken(axios)
 			throw Error(error)
 		}
 	}
@@ -122,15 +122,26 @@ function api() {
 	const getUser = async () => {
 		try {
 			const response = await axios.get(userURL)
-			await refreshToken(axios)
+			refreshToken(axios)
 			return response.data.result
 		} catch (error) {
-			if (error.response.status) {
-				const { status } = error.response
-				throw status
+			if (error.response.status === 401) {
+				try {
+					const response = await axios.get(userURL)
+					return response.data.result
+				} catch (error) {
+					const { status, statusText } = error.response
+					const errorObject = { status, statusText }
+					throw errorObject
+				}
 			}
-
-			return new Error(error)
+			if (error.response.status) {
+				const { status, statusText } = error.response
+				const errorObject = { status, statusText }
+				throw errorObject
+			}
+			await refreshToken(axios)
+			throw Error(error)
 		}
 	}
 

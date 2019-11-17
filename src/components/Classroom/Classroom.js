@@ -12,6 +12,7 @@ import ErrorTable from "../ErrorTable"
 import updateFieldUtil from "../../utils/updateField"
 import formValidationUtil from "../../utils/formValidation"
 import getUpdatedList from "../../utils/getUpdatedList"
+import { isEmpty } from "lodash"
 const api = API()
 
 const headerProps = {
@@ -33,7 +34,10 @@ const initialState = {
 	list: [],
 	listOrder: "increasing",
 	listSortKey: "id",
-	searchQuery: "",
+	search: {
+		query: "",
+		list: []
+	},
 	isChecked: {
 		titulo_bloco: {
 			"Bloco A": false,
@@ -99,7 +103,7 @@ const tituloBlocoList = [
 const numeroPisoList = ["0", "1", "2"]
 
 const fuseOptions = {
-	threshold: 0.6,
+	threshold: 0.2,
 	location: 0,
 	distance: 100,
 	maxPatternLength: 32,
@@ -319,14 +323,10 @@ export default class Classroom extends Component {
 		return codigo_sala
 	}
 
-	updateSearchQuery = event => {
-		const searchQuery = event.target.value
-		this.setState({ searchQuery })
-		if (searchQuery === "" || searchQuery.length < 4) {
-			this.setState({ list: this.state.initialList })
-		} else {
-			this.listSearch(this.state.searchQuery)
-		}
+	updateSearchQuery = async event => {
+		const search = await updateFieldUtil(event, this.state.search)
+		this.setState({ search })
+		this.listSearch()
 	}
 
 	updateField = async event => {
@@ -334,10 +334,15 @@ export default class Classroom extends Component {
 		this.setState({ classroom })
 	}
 
-	listSearch = term => {
-		const fuse = new Fuse(this.state.initialList, fuseOptions)
-		const list = fuse.search(term)
-		this.setState({ list })
+	listSearch = () => {
+		if (isEmpty(this.state.search.query)) {
+			this.setState({ list: this.state.initialList })
+		} else {
+			const term = this.state.search.query
+			const fuse = new Fuse(this.state.initialList, fuseOptions)
+			const list = fuse.search(term)
+			this.setState({ list })
+		}
 	}
 
 	listSort = async field => {

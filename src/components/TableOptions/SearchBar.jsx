@@ -12,6 +12,7 @@ export default props => {
 			<input
 				className="form-control "
 				type="text"
+				name="query"
 				value={value}
 				placeholder={placeholder}
 				onChange={onChange}
