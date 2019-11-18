@@ -5,7 +5,7 @@ const { refreshURL } = credentials.prod
 
 export default axios =>
 	axios
-		.post(refreshURL, {}, { timeout: 50 })
+		.post(refreshURL, {}, { timeout: 500 })
 		.then(async tokenRefreshResponse => {
 			if (tokenRefreshResponse.data.token) {
 				const { token } = tokenRefreshResponse.data
