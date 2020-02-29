@@ -1,15 +1,14 @@
 import { get, set } from "idb-keyval"
 import axios from "axios"
-import credentials from "./../credentials"
 
-const { accountURL } = credentials.prod
+const { REACT_APP_ACCOUNT_URL } = process.env
 // Obter dados online
 
 const getCacheData = async () => {
 	let userName, userEmail, userSiape, userRight
 	const userID = await get("id")
 	try {
-		const response = await axios.get(`${accountURL}/${userID}`)
+		const response = await axios.get(`${REACT_APP_ACCOUNT_URL}/${userID}`)
 		const user = response.data
 		userName = user.name_user
 		userEmail = user.email_user

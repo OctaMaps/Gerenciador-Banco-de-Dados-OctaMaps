@@ -1,11 +1,10 @@
 import { set } from "idb-keyval"
-import credentials from "./../credentials"
 
-const { refreshURL } = credentials.prod
+const { REACT_APP_REFRESH_URL } = process.env
 
 export default axios =>
 	axios
-		.post(refreshURL, {}, { timeout: 500 })
+		.post(REACT_APP_REFRESH_URL, {}, { timeout: 500 })
 		.then(async tokenRefreshResponse => {
 			if (tokenRefreshResponse.data.token) {
 				const { token } = tokenRefreshResponse.data

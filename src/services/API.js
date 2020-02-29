@@ -1,26 +1,25 @@
 import axios from "axios"
 import { isEmpty } from "lodash"
 import { saveAs } from "file-saver"
-import { set, get } from "idb-keyval"
+import { set } from "idb-keyval"
 import createAuthRefreshInterceptor from "axios-auth-refresh"
-import credentials from "./../credentials"
 import refreshToken from "./refreshToken"
 import getToken from "./token"
 
 function api() {
 	const {
-		classroomURL,
-		pdfURL,
-		validateTokenURL,
-		baseURL,
-		userURL,
-		accountURL,
-		refreshURL,
-		authURL
-	} = credentials.prod
+		REACT_APP_CLASSROOM_URL,
+		REACT_APP_PDF_URL,
+		REACT_APP_VALIDATE_TOKEN_URL,
+		REACT_APP_BASE_URL,
+		REACT_APP_USER_URL,
+		REACT_APP_ACCOUNT_URL,
+		REACT_APP_REFRESH_URL,
+		REACT_APP_AUTH_URL
+	} = process.env
 
 	const refreshAuthLogic = failedRequest =>
-		axios.post(refreshURL).then(async tokenRefreshResponse => {
+		axios.post(REACT_APP_REFRESH_URL).then(async tokenRefreshResponse => {
 			const { token } = tokenRefreshResponse.data
 			await set("token", token)
 			axios.defaults.headers.Authorization = "bearer " + token
@@ -36,27 +35,29 @@ function api() {
 		try {
 			const token = await getToken()
 			axios.defaults.headers.Authorization = "bearer " + token
-			axios.defaults.baseURL = baseURL
+			axios.defaults.baseURL = REACT_APP_BASE_URL
 			createAuthRefreshInterceptor(axios, () => refreshAuthLogic())
-			let response = await axios.post(validateTokenURL)
+			let response = await axios.post(REACT_APP_VALIDATE_TOKEN_URL)
 			let { isValid } = response.data
 			if (!isValid) {
 				refreshTokenAPI()
-				response = await axios.post(validateTokenURL)
+				response = await axios.post(REACT_APP_VALIDATE_TOKEN_URL)
 			}
 			return response.data.isValid
-		} catch (error) {}
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	const getClassroom = async () => {
 		try {
-			const response = await axios.get(classroomURL)
+			const response = await axios.get(REACT_APP_CLASSROOM_URL)
 			refreshToken(axios)
 			return response.data.result
 		} catch (error) {
 			if (error.response.status === 401) {
 				try {
-					const response = await axios.get(classroomURL)
+					const response = await axios.get(REACT_APP_CLASSROOM_URL)
 					return response.data.result
 				} catch (error) {
 					const { status, statusText } = error.response
@@ -75,7 +76,7 @@ function api() {
 
 	const removeClassroom = async classroom => {
 		try {
-			await axios.delete(`${classroomURL}/${classroom.id}`)
+			await axios.delete(`${REACT_APP_CLASSROOM_URL}/${classroom.id}`)
 		} catch (error) {
 			if (error.response.status) {
 				const { status } = error.response
@@ -88,8 +89,8 @@ function api() {
 	const saveClassroom = async classroom => {
 		const method = classroom.id ? "put" : "post"
 		const finalUrl = classroom.id
-			? `${classroomURL}/${classroom.id}`
-			: classroomURL
+			? `${REACT_APP_CLASSROOM_URL}/${classroom.id}`
+			: REACT_APP_CLASSROOM_URL
 		try {
 			const response = await axios[method](finalUrl, classroom)
 			return classroom.id ? classroom : response.data.classroom[0]
@@ -104,11 +105,13 @@ function api() {
 
 	const fetchAndGetList = async list => {
 		try {
-			await axios.post(pdfURL, { data: list })
-			const response = await axios.get(pdfURL, {
+			await axios.post(REACT_APP_PDF_URL, { data: list })
+			const response = await axios.get(REACT_APP_PDF_URL, {
 				responseType: "blob"
 			})
-			const listBlob = new Blob([response.data], { type: "application/pdf" })
+			const listBlob = new Blob([response.data], {
+				type: "application/pdf"
+			})
 			saveAs(listBlob, "list.pdf")
 		} catch (error) {
 			if (error.response.status) {
@@ -121,13 +124,14 @@ function api() {
 
 	const getUser = async () => {
 		try {
-			const response = await axios.get(userURL)
+			console.log(REACT_APP_USER_URL)
+			const response = await axios.get(REACT_APP_USER_URL)
 			refreshToken(axios)
 			return response.data.result
 		} catch (error) {
 			if (error.response.status === 401) {
 				try {
-					const response = await axios.get(userURL)
+					const response = await axios.get(REACT_APP_USER_URL)
 					return response.data.result
 				} catch (error) {
 					const { status, statusText } = error.response
@@ -147,7 +151,9 @@ function api() {
 
 	const saveUser = async user => {
 		const method = user.id ? "put" : "post"
-		const finalUrl = user.id ? `${userURL}/${user.id}` : userURL
+		const finalUrl = user.id
+			? `${REACT_APP_USER_URL}/${user.id}`
+			: REACT_APP_USER_URL
 		try {
 			const response = await axios[method](finalUrl, user)
 			if (!user.id) {
@@ -165,7 +171,7 @@ function api() {
 
 	const removeUser = async user => {
 		try {
-			await axios.delete(`${userURL}/${user.id}`)
+			await axios.delete(`${REACT_APP_USER_URL}/${user.id}`)
 		} catch (error) {
 			if (error.response.status) {
 				const { status } = error.response
@@ -179,7 +185,10 @@ function api() {
 
 	const checkPassword = async account => {
 		try {
-			const response = await axios.post(`${accountURL}/${account.id}`, account)
+			const response = await axios.post(
+				`${REACT_APP_ACCOUNT_URL}/${account.id}`,
+				account
+			)
 			if (response.data) {
 				return true
 			} else {
@@ -191,17 +200,25 @@ function api() {
 	}
 
 	const editUser = async user => {
-		const finalURL = `${accountURL}/${user.id}`
+		const finalURL = `${REACT_APP_ACCOUNT_URL}/${user.id}`
 		const { old_password_user, new_password_user } = user
 		try {
 			if (
 				(!old_password_user && new_password_user) ||
 				(old_password_user && !new_password_user)
 			) {
-				throw new Error("É necessário preencher ambas as senhas ou nenhuma")
-			} else if (!isEmpty(old_password_user) && !isEmpty(new_password_user)) {
+				throw new Error(
+					"É necessário preencher ambas as senhas ou nenhuma"
+				)
+			} else if (
+				!isEmpty(old_password_user) &&
+				!isEmpty(new_password_user)
+			) {
 				if (!checkPassword(user)) throw new Error("Senha incorreta")
-			} else if (isEmpty(old_password_user) && isEmpty(new_password_user)) {
+			} else if (
+				isEmpty(old_password_user) &&
+				isEmpty(new_password_user)
+			) {
 				delete user.old_password_user
 				delete user.new_password_user
 			}
@@ -224,7 +241,7 @@ function api() {
 		try {
 			const response = await axios({
 				method: "post",
-				url: authURL,
+				url: REACT_APP_AUTH_URL,
 				data: {
 					email: userEmail,
 					password
@@ -240,7 +257,10 @@ function api() {
 				await set("email", email)
 				return { message: "Sucesso!", color: "green" }
 			} catch (error) {
-				return { message: "Problemas internos com a aplicação", color: "red" }
+				return {
+					message: "Problemas internos com a aplicação",
+					color: "red"
+				}
 			}
 		} catch (error) {
 			try {
@@ -253,7 +273,10 @@ function api() {
 					}
 				}
 				if (status === 404) {
-					return { message: "Usuário ou senha incorreta", color: "red" }
+					return {
+						message: "Usuário ou senha incorreta",
+						color: "red"
+					}
 				}
 			} catch (error) {
 				return { message: "Servidor Indisponível", color: "red" }
