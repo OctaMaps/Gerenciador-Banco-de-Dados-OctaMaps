@@ -50,6 +50,8 @@ export default class Login extends Component {
 				}
 				await this.setState({ message, colorOfMessage })
 				this.setState({ showMessage: true })
+				if (message === "Sucesso!")
+					setTimeout(() => window.location.reload(false), 300)
 			}
 		} catch (error) {
 			const message = "Erro interno - Servidor Indisponível"
@@ -71,7 +73,9 @@ export default class Login extends Component {
 							name="email"
 							placeholder="Digite seu Email"
 							value={this.state.email}
-							onChange={async event => await this.updateField(event)}
+							onChange={async event =>
+								await this.updateField(event)
+							}
 						/>
 					</div>
 					<div className="form-group">

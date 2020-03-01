@@ -23,6 +23,7 @@ export default class Login extends Component {
 		del("right")
 		del("siape")
 		del("email")
+		setTimeout(() => window.location.reload(false), 300)
 	}
 
 	goBack = () => {
