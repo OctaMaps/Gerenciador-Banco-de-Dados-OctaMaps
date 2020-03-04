@@ -1,5 +1,5 @@
 # Stage 1
-FROM node:10 as react-build
+FROM node:lts as react-build
 WORKDIR /app
 COPY . ./
 RUN npm install
