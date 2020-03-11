@@ -124,7 +124,6 @@ function api() {
 
 	const getUser = async () => {
 		try {
-			console.log(REACT_APP_USER_URL)
 			const response = await axios.get(REACT_APP_USER_URL)
 			refreshToken(axios)
 			return response.data.result
