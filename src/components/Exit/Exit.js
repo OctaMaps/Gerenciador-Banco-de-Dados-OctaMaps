@@ -27,7 +27,7 @@ export default class Login extends Component {
 	}
 
 	goBack = () => {
-		return <Link to="/" />
+		return <Link to="/gerenciador" />
 	}
 
 	render() {

@@ -6,7 +6,7 @@ import "./Logo.css"
 export default props => {
 	return (
 		<aside className="logo">
-			<NavLink to="/" className="logo">
+			<NavLink to="/gerenciador" className="logo">
 				<img src={logo} alt="logo" />
 			</NavLink>
 		</aside>

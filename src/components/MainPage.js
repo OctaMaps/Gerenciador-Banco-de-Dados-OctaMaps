@@ -17,12 +17,19 @@ export default props => {
 			<Logo />
 			<Nav />
 			<Switch>
-				<Route exact path="/" component={props => <Home name={name} />} />
-				<Route path="/salas" component={Classroom} />
-				<Route path="/usuarios" component={User} />
-				<Route path="/conta" component={Account} />
-				<Route path="/sair" component={props => <Exit {...props} />} />
-				<Redirect to="/" />
+				<Route
+					exact
+					path="/gerenciador"
+					component={props => <Home name={name} />}
+				/>
+				<Route path="/gerenciador/salas" component={Classroom} />
+				<Route path="/gerenciador/usuarios" component={User} />
+				<Route path="/gerenciador/conta" component={Account} />
+				<Route
+					path="/gerenciador/sair"
+					component={props => <Exit {...props} />}
+				/>
+				<Redirect to="/gerenciador" />
 			</Switch>
 			<Footer />
 		</>

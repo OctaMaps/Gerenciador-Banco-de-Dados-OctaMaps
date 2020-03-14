@@ -21,18 +21,21 @@ export default class Routes extends Component {
 		if (!isAuthenticated) {
 			return (
 				<Switch>
-					<Route path="/login" component={Login} />
-					<Redirect from="*" to={{ pathname: "/login" }} />
+					<Route path="/gerenciador/login" component={Login} />
+					<Redirect
+						from="*"
+						to={{ pathname: "/gerenciador/login" }}
+					/>
 				</Switch>
 			)
 		}
 		return (
 			<Switch>
 				<Route
-					path="/"
+					path="/gerenciador"
 					component={props => <MainPage name={this.state.name} />}
 				/>
-				<Redirect to={{ pathname: "/" }} />
+				<Redirect to={{ pathname: "/gerenciador" }} />
 			</Switch>
 		)
 	}
