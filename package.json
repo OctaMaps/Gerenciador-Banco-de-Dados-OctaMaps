@@ -13,7 +13,7 @@
     "fuse.js": "^3.4.4",
     "idb-keyval": "^3.2.0",
     "jspdf": "^1.5.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "pdfmake": "^0.1.54",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.8",
