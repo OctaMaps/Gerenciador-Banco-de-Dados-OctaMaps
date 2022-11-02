@@ -12,7 +12,7 @@
     "font-awesome": "4.7.0",
     "fuse.js": "^3.4.4",
     "idb-keyval": "^3.2.0",
-    "jspdf": "^1.5.3",
+    "jspdf": "^2.5.1",
     "lodash": "^4.17.15",
     "pdfmake": "^0.1.54",
     "react": "^16.8.6",
